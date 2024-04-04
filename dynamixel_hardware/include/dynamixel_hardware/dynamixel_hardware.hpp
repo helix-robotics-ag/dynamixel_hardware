@@ -64,6 +64,8 @@ class DynamixelHardware
 public:
   RCLCPP_SHARED_PTR_DEFINITIONS(DynamixelHardware)
 
+  virtual ~DynamixelHardware();
+
   DYNAMIXEL_HARDWARE_PUBLIC
   CallbackReturn on_init(const hardware_interface::HardwareInfo & info) override;
 
@@ -81,6 +83,9 @@ public:
 
   DYNAMIXEL_HARDWARE_PUBLIC
   CallbackReturn on_deactivate(const rclcpp_lifecycle::State & previous_state) override;
+
+  DYNAMIXEL_HARDWARE_PUBLIC
+  CallbackReturn on_shutdown(const rclcpp_lifecycle::State & previous_state) override;
 
   DYNAMIXEL_HARDWARE_PUBLIC
   return_type read(const rclcpp::Time & time, const rclcpp::Duration & period) override;

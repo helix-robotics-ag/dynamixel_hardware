@@ -50,6 +50,14 @@ constexpr const char * const kExtraJointParameters[] = {
   "Velocity_I_Gain",
 };
 
+DynamixelHardware::~DynamixelHardware()
+{
+  // If controller manager is shutdown via Ctrl + C, the on_deactivate/shutdown methods won't be called.
+  // We need to call them here to ensure that the device is stopped and disconnected.
+  // Workaround based on https://github.com/ICube-Robotics/forcedimension_ros2/pull/17
+  on_shutdown(rclcpp_lifecycle::State());
+}
+
 CallbackReturn DynamixelHardware::on_init(const hardware_interface::HardwareInfo & info)
 {
   RCLCPP_INFO(rclcpp::get_logger(kDynamixelHardware), "init");
@@ -216,8 +224,6 @@ CallbackReturn DynamixelHardware::on_configure(const rclcpp_lifecycle::State & /
   return CallbackReturn::SUCCESS;
 }
 
-// TODO - add on_cleanup to disable torque
-
 std::vector<hardware_interface::StateInterface> DynamixelHardware::export_state_interfaces()
 {
   RCLCPP_INFO(rclcpp::get_logger(kDynamixelHardware), "export_state_interfaces");
@@ -262,6 +268,15 @@ CallbackReturn DynamixelHardware::on_activate(const rclcpp_lifecycle::State & /*
 CallbackReturn DynamixelHardware::on_deactivate(const rclcpp_lifecycle::State & /* previous_state */)
 {
   RCLCPP_INFO(rclcpp::get_logger(kDynamixelHardware), "deactivate");
+  return CallbackReturn::SUCCESS;
+}
+
+CallbackReturn DynamixelHardware::on_shutdown(const rclcpp_lifecycle::State & /* previous_state */)
+{
+  RCLCPP_INFO(rclcpp::get_logger(kDynamixelHardware), "shutdown");
+
+  enable_torque(false);
+
   return CallbackReturn::SUCCESS;
 }
 
